@@ -1,9 +1,8 @@
 import numpy as np
 from numpy.linalg import norm as norm
-from scipy.integrate import solve_ivp as solve
 import matplotlib.pyplot as plt
 
-STEPS = 500
+STEPS = 5000
 
 # CONSTANTS
 RADIUS = 6378 # m
@@ -20,7 +19,7 @@ MASS_PROTON = 1.673e-27 # kg
 GYRO_FREQUENCY_ELECTRON = ELEMENTARY_CHARGE*MAGNETIC_FIELD/(4**3)/MASS_ELECTRON
 GYRO_FREQUENCY_PROTON = ELEMENTARY_CHARGE*MAGNETIC_FIELD/(4**3)/MASS_PROTON
 # print(f'{2*np.pi / GYRO_FREQUENCY_ELECTRON :.3e}')
-dt = 1e-6
+dt = 1e-7 # 1e-4 to see the proton gyrations
 
 # POSITION ARRAYS (AT t=0, L=4)
 r_ELECTRON = np.empty((STEPS, 2))
