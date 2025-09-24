@@ -2,7 +2,9 @@ import numpy as np
 from numpy.linalg import norm as norm
 import matplotlib.pyplot as plt
 
-STEPS = 5000
+plt.rcParams.update({'font.size':13})
+
+STEPS = 40000
 
 # CONSTANTS
 RADIUS = 6378 # m
@@ -19,7 +21,7 @@ MASS_PROTON = 1.673e-27 # kg
 GYRO_FREQUENCY_ELECTRON = ELEMENTARY_CHARGE*MAGNETIC_FIELD/(4**3)/MASS_ELECTRON
 GYRO_FREQUENCY_PROTON = ELEMENTARY_CHARGE*MAGNETIC_FIELD/(4**3)/MASS_PROTON
 # print(f'{2*np.pi / GYRO_FREQUENCY_ELECTRON :.3e}')
-dt = 1e-7 # 1e-4 to see the proton gyrations
+dt = 1e-4 # 1e-4 to see the proton gyrations
 
 # POSITION ARRAYS (AT t=0, L=4)
 r_ELECTRON = np.empty((STEPS, 2))
@@ -53,8 +55,52 @@ for step in range(1, STEPS):
     # UPDATE PROTON POSITION
     r_PROTON[step] = r_PROTON[step-1] + dt * (v_PROTON[step-1] + v_PROTON[step])*0.5
 
-fig, axs = plt.subplots(1, 2, figsize=(16, 9))
-axs[0].scatter(r_ELECTRON[:, 0], r_ELECTRON[:, 1])
-axs[1].scatter(r_PROTON[:, 0], r_PROTON[:, 1])
-plt.tight_layout()
+fig, axs = plt.subplots(1, 2, figsize=(16, 9), gridspec_kw={'width_ratios':[0.6, 0.4]})
+axs[0].plot(r_ELECTRON[1:, 0], r_ELECTRON[1:, 1], label='Trajectory')
+axs[0].scatter(r_ELECTRON[0, 0], r_ELECTRON[0, 1], color='red', label='Initial point')
+axs[0].set_title('Electron trajectory')
+axs[0].set_xlabel('x (m)')
+axs[0].set_ylabel('y (m)')
+axs[0].legend()
+axs[0].grid(alpha=.4)
+axs[0].axis('equal')
+
+axs[1].plot(range(STEPS), norm(v_ELECTRON, axis=1), label='Velocity')
+axs[1].axhline(norm(v_ELECTRON[0]), label='Expected velocity\n' rf'$v_0$={norm(v_ELECTRON[0]):.1e}m/s', c='tab:orange', alpha=.7)
+axs[1].axhline(3.0e8, label='Speed of light', c='red', alpha=.7)
+if np.max(norm(v_ELECTRON, axis=1)) > 3.0e8:
+    axs[1].fill_between(range(STEPS), 3.0e8, axs[1].get_ylim()[1], alpha=.2, color='red')
+axs[1].set_xlabel('time (s)')
+axs[1].set_ylabel('velocity (m/s)')
+axs[1].legend()
+axs[1].grid(alpha=.4)
+axs[1].set_title('Velocity of the electron')
+
+fig.suptitle(rf'Simulation time: {STEPS*dt:.1e}s - $\Delta t$={dt}s, {STEPS} time steps')
+fig.tight_layout()
+plt.show()
+
+fig, axs = plt.subplots(1, 2, figsize=(16, 9), gridspec_kw={'width_ratios':[0.6, 0.4]})
+axs[0].plot(r_PROTON[1:, 0], r_PROTON[1:, 1], label='Trajectory')
+axs[0].scatter(r_PROTON[0, 0], r_PROTON[0, 1], color='red', label='Initial point')
+axs[0].set_title('Proton trajectory')
+axs[0].set_xlabel('x (m)')
+axs[0].set_ylabel('y (m)')
+axs[0].legend()
+axs[0].grid(alpha=.4)
+axs[0].axis('equal')
+
+axs[1].plot(range(STEPS), norm(v_PROTON, axis=1), label='Velocity')
+axs[1].axhline(norm(v_PROTON[0]), label='Expected velocity\n' rf'$v_0$={norm(v_PROTON[0]):.1e}m/s', c='tab:orange', alpha=.7)
+if np.max(norm(v_PROTON, axis=1)) > 3.0e8:
+    axs[1].axhline(3.0e8, label='Speed of light', c='red', alpha=.7)
+    axs[1].fill_between(range(STEPS), 3.0e8, axs[1].get_ylim()[1], alpha=.2, color='red')
+axs[1].set_xlabel('time (s)')
+axs[1].set_ylabel('velocity (m/s)')
+axs[1].legend()
+axs[1].grid(alpha=.4)
+axs[1].set_title('Velocity of the proton')
+
+fig.suptitle(rf'Simulation time: {STEPS*dt:.1e}s - $\Delta t$={dt}s, {STEPS} time steps')
+fig.tight_layout()
 plt.show()
